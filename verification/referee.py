@@ -33,6 +33,22 @@ from checkio.referees import cover_codes
 
 from tests import TESTS
 
+# Test data is transformed by JSON before it is given to the function written
+# by the user so in order for the cipher to have integers as keys, we must
+# change the keys to integers in a cover like this:
+cover_int = '''
+def cover(func, data):
+    str_cipher = data[0]
+
+    def to_int_keys(json):
+        return {
+            int(key): to_int_keys(value) if value != {} else {}
+            for key, value in json.items()
+        }
+
+    int_cipher = to_int_keys(str_cipher)
+    return func(int_cipher)
+'''
 
 api.add_listener(
     ON_CONNECT,
@@ -42,6 +58,6 @@ api.add_listener(
             "python": "get_plain",
         },
         cover_code={
-            'python-3': cover_codes.unwrap_args,    
+            'python-3': cover_int,
         }
     ).on_ready)
